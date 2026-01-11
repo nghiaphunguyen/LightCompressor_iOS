@@ -141,9 +141,22 @@ public struct LightCompressor {
             
             // Handle new width and height values
             let videoSize = videoTrack.naturalSize
-            let size: (width: Int, height: Int) = configuration.videoSize == nil ?
-            generateWidthAndHeight(width: videoSize.width, height: videoSize.height, keepOriginalResolution: configuration.keepOriginalResolution)
-            : (Int(configuration.videoSize!.width), Int(configuration.videoSize!.height))
+            
+            // Check if video is rotated (portrait mode)
+            let transform = videoTrack.preferredTransform
+            let isPortrait = transform.a == 0 && abs(transform.b) == 1 && abs(transform.c) == 1 && transform.d == 0
+            
+            var size: (width: Int, height: Int)
+            if configuration.videoSize == nil {
+                size = generateWidthAndHeight(width: videoSize.width, height: videoSize.height, keepOriginalResolution: configuration.keepOriginalResolution)
+            } else {
+                // If video is portrait and user provided custom size, swap dimensions to match natural size
+                if isPortrait {
+                    size = (Int(configuration.videoSize!.height), Int(configuration.videoSize!.width))
+                } else {
+                    size = (Int(configuration.videoSize!.width), Int(configuration.videoSize!.height))
+                }
+            }
             
             let newWidth = size.width
             let newHeight = size.height
