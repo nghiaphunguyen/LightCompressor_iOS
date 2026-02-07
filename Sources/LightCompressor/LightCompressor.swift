@@ -135,7 +135,7 @@ public struct LightCompressor {
             }
             
             // Generate a bitrate based on desired quality
-            let newBitrate = configuration.videoBitrate == nil ?
+            let newBitrate = (configuration.videoBitrate == nil || Float(configuration.videoBitrate!) >= bitrate) ?
             getBitrate(bitrate: bitrate, quality: configuration.quality) :
             configuration.videoBitrate!
             
